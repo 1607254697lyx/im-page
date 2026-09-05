@@ -1,0 +1,33 @@
+body.editor-preview-mode{min-height:100vh;}
+.editor-preview-mode .wrap{padding-top:54px;}
+.site-module{margin:0 0 48px;}
+.site-module.story{margin-top:70px;}
+.site-module.works{margin-bottom:48px;}
+.site-module .works-group-title{margin-top:0!important;}
+.site-module[data-module-type="album"] .works-group-title{margin-bottom:18px;}
+.site-module[data-module-type="experience"] .sec-head{margin-bottom:20px;}
+.site-module.is-hidden{display:none!important;}
+.empty-state{padding:30px 18px;text-align:center;color:var(--ink-3);font-size:13px;border:1px dashed var(--line);}
+.editor-preview-mode .story-card.split{min-height:276px;}
+.editor-preview-mode .story-card.stack-reverse{flex-direction:column-reverse;}
+.editor-preview-mode .story-card.side-reverse .story-img{order:2;padding:10px 10px 10px 4px;}
+.editor-preview-mode .story-card.side-reverse .story-info{order:1;padding:14px 8px 14px 24px;}
+.editor-preview-mode .ab-cover-photo{width:30%;}
+.editor-preview-mode .xhs-cards{grid-template-columns:repeat(3,minmax(0,1fr));}
+.editor-preview-mode .story-arrow,.xhs-arrow{width:34px;height:34px;padding:0;border:1px solid #D9D4CB;border-radius:50%;background:#fff;color:var(--ink-2);font-size:18px;line-height:1;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:none;}
+.editor-preview-mode .story-arrow:hover:not(:disabled),.xhs-arrow:hover{background:var(--card-warm);color:var(--accent);border-color:#D9D4CB;}
+.xhs-carousel{display:grid;grid-template-columns:34px minmax(0,1fr) 34px;align-items:center;gap:10px;}
+.xhs-window{overflow:hidden;}
+.xhs-track{display:grid;grid-auto-flow:column;grid-auto-columns:calc((100% - 24px)/3);column-gap:12px;transition:transform .38s cubic-bezier(.25,.8,.3,1);}
+.xhs-arrow{position:static;transform:none;}
+.xhs-arrow[hidden]{display:inline-flex!important;visibility:hidden;pointer-events:none;}
+.editor-preview-mode .footer{padding-top:8px;}
+@media(max-width:560px){
+  .editor-preview-mode .wrap{padding-top:38px;}
+  .site-module.story{margin-top:54px;}
+  .editor-preview-mode .xhs-cards{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .xhs-track{grid-auto-columns:calc((100% - 8px)/2);column-gap:8px;}
+  .xhs-carousel{grid-template-columns:30px minmax(0,1fr) 30px;gap:6px;}
+  .xhs-arrow{width:30px;height:30px;}
+  .editor-preview-mode .ab-cover-photo{width:40%;}
+}
