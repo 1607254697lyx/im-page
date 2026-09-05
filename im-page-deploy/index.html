@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>个人网页生成器</title>
+  <link rel="stylesheet" href="personal-site-editor.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">I‘m</span><span>个人网页生成器</span></div>
+    <div class="top-actions">
+      <span class="save-status" id="saveStatus">准备就绪</span>
+      <button class="button ghost" id="resetButton" type="button">恢复初始</button>
+      <button class="button ghost" id="exportConfigButton" type="button">导出配置</button>
+      <button class="button ghost" id="exportHtmlButton" type="button">下载网页</button>
+      <button class="button primary" id="publishButton" type="button">发布</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="preview-pane" aria-label="网页预览">
+      <div class="preview-toolbar">
+        <span>实时预览</span>
+        <div class="view-switch" role="group" aria-label="预览尺寸">
+          <button type="button" class="is-active" data-view="desktop" title="桌面预览">桌面</button>
+          <button type="button" data-view="mobile" title="手机预览">手机</button>
+        </div>
+      </div>
+      <div class="preview-stage" id="previewStage">
+        <iframe id="sitePreview" title="个人主页实时预览" src="editable-site-preview.html"></iframe>
+      </div>
+    </section>
+
+    <aside class="editor-pane" aria-label="编辑区">
+      <div class="panel-scroll">
+        <section class="panel-section">
+          <div class="panel-heading theme-heading"><div><span class="eyebrow">THEME</span><h1>主题色</h1></div><div id="themeEditor"></div></div>
+        </section>
+
+        <section class="panel-section">
+          <div class="panel-heading"><div><span class="eyebrow">PROFILE</span><h1>头像与介绍</h1></div></div>
+          <div id="profileEditor"></div>
+        </section>
+
+        <section class="panel-section" id="contentSection">
+          <div class="panel-heading"><div><span class="eyebrow">CONTENT</span><h2 id="contentHeading">模块内容</h2></div></div>
+          <div id="moduleEditor"></div>
+        </section>
+
+        <section class="panel-section">
+          <div class="panel-heading"><div><span class="eyebrow">FOOTER</span><h2>页脚链接</h2></div></div>
+          <div id="footerEditor"></div>
+        </section>
+
+        <section class="panel-section">
+          <div class="panel-heading"><div><span class="eyebrow">BUTTON</span><h2>底部按钮</h2></div></div>
+          <div id="ctaEditor"></div>
+        </section>
+      </div>
+      <dialog class="module-picker" id="modulePicker">
+        <div class="module-picker-head"><strong>添加模块</strong><button class="icon-button" type="button" data-action="close-module-picker" aria-label="关闭">×</button></div>
+        <div class="module-template-list">
+          <button type="button" data-action="add-module-template" data-type="experience"><span>我的经历</span><small>经历卡片与轮播</small></button>
+          <button type="button" data-action="add-module-template" data-type="products"><span>我的产品</span><small>产品图标、介绍与链接</small></button>
+          <button type="button" data-action="add-module-template" data-type="xhs"><span>我的小红书</span><small>图片卡片与横向轮播</small></button>
+          <button type="button" data-action="add-module-template" data-type="album"><span>我的摄影</span><small>翻页相册与页面模板</small></button>
+          <button type="button" data-action="add-module-template" data-type="notes"><span>我的笔记</span><small>标题与链接列表</small></button>
+        </div>
+      </dialog>
+    </aside>
+  </main>
+
+  <dialog class="module-picker publish-dialog" id="publishDialog">
+    <div class="module-picker-head"><strong>发布网站</strong><button class="icon-button" id="closePublishButton" type="button" aria-label="关闭">×</button></div>
+    <div class="publish-dialog-body">
+      <p id="publishMessage">正在保存 index.html…</p>
+      <div class="publish-result" id="publishResult" hidden>
+        <div class="publish-link-row">
+          <input id="publishFilePath" type="text" value="~/Downloads/index.html" readonly aria-label="index.html 文件地址">
+          <button class="button ghost" id="copyPublishPathButton" type="button">复制地址</button>
+        </div>
+      </div>
+      <div class="publish-dialog-actions">
+        <a class="button primary" href="https://github.com/new" target="_blank" rel="noopener">前往 GitHub</a>
+      </div>
+    </div>
+  </dialog>
+
+  <input id="configImport" type="file" accept="application/json" hidden>
+  <script src="personal-site-editor.js"></script>
+</body>
+</html>
