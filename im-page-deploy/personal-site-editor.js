@@ -3,6 +3,7 @@
 
   var DEFAULT_CONFIG = {
     themeColor:'#8478D2',
+    experienceStyle:'polaroid',
     profile:{
       avatar:'yaxin-assets/avatar-final.png',
       name:'yaxin',
@@ -15,7 +16,7 @@
         {date:'2026 · 夏',title:'智谱',description:'很幸运进入智谱，做桌面Agent产品AutoClaw的实习生，在这里浸泡在AI的氛围中，每天都在学习很多新而有趣的东西。',image:'story-assets/story-1.jpg',layout:'stack'},
         {date:'2026 · 春',title:'网易',description:'网易是我接触AI产品的开端，让我开始看到这个神秘又神奇的领域，思考AI满足用户需求的可能性。',image:'story-assets/story-2.jpg',layout:'stack'},
         {date:'2025 · 秋冬',title:'乐信圣文',description:'我做产品的起点，这里有很好的mentor、很成熟的团队、很规范且高效的业务流程，是我会怀念的地方。',image:'story-assets/story-3.jpg',layout:'side'},
-        {date:'2024 · 夏',title:'四姑娘山',description:'毕业后在四姑娘山下做了一个月义工，是我生命中美好、充满生机的夏天。',image:'story-assets/story-4.jpg',layout:'side'}
+        {date:'2024 · 夏',title:'四姑娘山',description:'毕业后在四姑娘山下做了一个月义工，是我生命中美好、充满生机的夏天。',image:'story-assets/story-4.jpg',layout:'side-reverse'}
       ]},
       {id:'products-main',type:'products',title:'我的产品',visible:true,items:[
         {title:'QuickNote',description:'随手记一切的轻量笔记，我的第一个独立产品',image:'yaxin-assets/quicknote-icon-final.png',url:'https://github.com/'}
@@ -96,7 +97,7 @@
   function itemImageAttrs(module,index,fieldName){return 'data-image="item" data-id="'+module.id+'" data-index="'+index+'" data-field="'+fieldName+'"';}
 
   function renderExperienceEditor(module){
-    return module.items.map(function(item,index){return '<div class="item-card '+(item.visible===false?'is-hidden':'')+'">'+itemHeader('经历 '+(index+1),module,index)+'<div class="field"><span>图片</span>'+imageField(item.image,itemImageAttrs(module,index,'image'))+'</div><div class="inline-grid">'+field('时间',item.date,itemAttrs(module,index,'date'))+field('标题',item.title,itemAttrs(module,index,'title'))+'</div><label class="field"><span>布局</span><select '+itemAttrs(module,index,'layout')+'><option value="stack" '+(item.layout==='stack'?'selected':'')+'>图上文字下</option><option value="stack-reverse" '+(item.layout==='stack-reverse'?'selected':'')+'>文字上图下</option><option value="side" '+(item.layout==='side'?'selected':'')+'>图左文字右</option><option value="side-reverse" '+(item.layout==='side-reverse'?'selected':'')+'>文字左图右</option></select></label>'+textarea('描述',item.description,itemAttrs(module,index,'description'))+'</div>';}).join('')+'<button class="add-button" type="button" data-action="add-item" data-id="'+module.id+'">＋ 添加经历</button>';
+    return module.items.map(function(item,index){return '<div class="item-card '+(item.visible===false?'is-hidden':'')+'">'+itemHeader('经历 '+(index+1),module,index)+'<div class="field"><span>图片</span>'+imageField(item.image,itemImageAttrs(module,index,'image'))+'</div><div class="inline-grid">'+field('时间',item.date,itemAttrs(module,index,'date'))+field('标题',item.title,itemAttrs(module,index,'title'))+'</div><label class="field"><span>布局</span><select '+itemAttrs(module,index,'layout')+'><option value="stack" '+(item.layout==='stack'||item.layout==='stack-reverse'?'selected':'')+'>横图 · 文字下</option><option value="side" '+(item.layout==='side'?'selected':'')+'>竖图 · 文字右</option><option value="side-reverse" '+(item.layout==='side-reverse'?'selected':'')+'>竖图 · 文字左</option></select></label>'+textarea('描述',item.description,itemAttrs(module,index,'description'))+'</div>';}).join('')+'<button class="add-button" type="button" data-action="add-item" data-id="'+module.id+'">＋ 添加经历</button>';
   }
   function renderProductsEditor(module){
     return module.items.map(function(item,index){return '<div class="item-card '+(item.visible===false?'is-hidden':'')+'">'+itemHeader('产品 '+(index+1),module,index)+'<div class="field"><span>图标</span>'+imageField(item.image,itemImageAttrs(module,index,'image'))+'</div>'+field('名称',item.title,itemAttrs(module,index,'title'))+textarea('描述',item.description,itemAttrs(module,index,'description'))+field('链接',item.url,itemAttrs(module,index,'url'),'url')+'</div>';}).join('')+'<button class="add-button" type="button" data-action="add-item" data-id="'+module.id+'">＋ 添加产品</button>';
@@ -149,7 +150,7 @@
     catch(error){setStatus('草稿保存失败');}
   }
   async function loadDraft(){
-    try{var db=await openDb();var tx=db.transaction('drafts','readonly');var request=tx.objectStore('drafts').get('main');var draft=await new Promise(function(resolve,reject){request.onsuccess=function(){resolve(request.result);};request.onerror=function(){reject(request.error);};});if(draft){config=draft;selectedId=config.modules[0]&&config.modules[0].id;setStatus('已恢复草稿');}}
+    try{var db=await openDb();var tx=db.transaction('drafts','readonly');var request=tx.objectStore('drafts').get('main');var draft=await new Promise(function(resolve,reject){request.onsuccess=function(){resolve(request.result);};request.onerror=function(){reject(request.error);};});if(draft){config=draft;if(!config.experienceStyle){config.modules.filter(function(module){return module.type==='experience';}).forEach(function(module){module.items.forEach(function(item){if(item.layout==='stack-reverse')item.layout='stack';});});var mainExperience=config.modules.find(function(module){return module.id==='experience-main';});if(mainExperience&&mainExperience.items[3]&&mainExperience.items[3].title==='四姑娘山')mainExperience.items[3].layout='side-reverse';config.experienceStyle='polaroid';}selectedId=config.modules[0]&&config.modules[0].id;setStatus('已恢复草稿');}}
     catch(error){setStatus('使用初始内容');}
   }
   function changed(structural){
