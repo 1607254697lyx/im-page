@@ -3,75 +3,127 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>个人主页编辑器</title>
+  <meta name="description" content="上传内容、调整布局，轻松做出属于自己的个人主页。">
   <meta name="theme-color" content="#8478D2">
-  <meta name="description" content="个人主页编辑器：上传内容、调整模块，轻松生成并发布属于自己的个人网页。">
-  <title>I'm 个人主页编辑器</title>
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="product.css">
+  <link rel="stylesheet" href="personal-site-editor.css">
 </head>
 <body>
-  <header class="site-header">
-    <a class="brand" href="./" aria-label="I'm 个人主页编辑器首页"><img src="yaxin-assets/im-generator-icon.png" alt=""><span>I'm 个人主页编辑器</span></a>
-    <nav aria-label="主要导航"><a href="#features">功能</a><a href="#install">安装</a><a class="nav-action quick-start" href="editor.html?mode=quick" data-tip="不保留历史">快速开始</a></nav>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark" aria-label="I'm">I’m</span><span>个人主页编辑器</span></div>
+    <div class="top-actions">
+      <span class="save-status" id="saveStatus">准备就绪</span>
+      <button class="button ghost history-button" id="historyButton" type="button">历史记录</button>
+      <button class="button ghost" id="resetButton" type="button">恢复初始</button>
+      <button class="button ghost" id="exportConfigButton" type="button">导出配置</button>
+      <button class="button ghost" id="exportHtmlButton" type="button">下载网页</button>
+      <button class="button primary" id="publishButton" type="button">发布</button>
+    </div>
   </header>
 
-  <main>
-    <section class="hero">
-      <div class="hero-copy">
-        <p class="eyebrow">PERSONAL PAGE EDITOR</p>
-        <h1>个人主页编辑器</h1>
-        <p class="hero-description">上传自己的照片和内容，自由调整模块与顺序，快速做出并发布属于你的个人网页。</p>
-        <div class="hero-actions">
-          <a class="button primary quick-start" href="editor.html?mode=quick" data-tip="不保留历史">快速开始</a>
-          <button class="button secondary install-button" data-install-app type="button">安装应用</button>
+  <main class="workspace">
+    <section class="preview-pane" aria-label="网页预览">
+      <div class="preview-toolbar">
+        <span>实时预览</span>
+        <div class="view-switch" role="group" aria-label="预览尺寸">
+          <button type="button" class="is-active" data-view="desktop" title="桌面预览">桌面</button>
+          <button type="button" data-view="mobile" title="手机预览">手机</button>
         </div>
       </div>
-      <div class="product-window" aria-label="个人主页编辑器界面预览">
-        <div class="window-bar"><span></span><span></span><span></span><b>个人主页编辑器</b></div>
-        <div class="window-body">
-          <div class="mock-preview">
-            <img class="mock-avatar" src="yaxin-assets/avatar-final.png" alt="个人主页头像示例">
-            <span class="mock-line short"></span><span class="mock-line"></span>
-            <div class="mock-polaroid"><img src="story-assets/story-1.jpg" alt="个人经历照片示例"></div>
-          </div>
-          <div class="mock-editor">
-            <span class="mock-label">主题色</span><i class="color-dot"></i>
-            <span class="mock-label">头像与介绍</span><span class="mock-field"></span><span class="mock-field tall"></span>
-            <span class="mock-label">模块内容</span><span class="mock-field"></span><span class="mock-field"></span><span class="mock-field"></span>
-          </div>
-        </div>
+      <div class="preview-stage" id="previewStage">
+        <iframe id="sitePreview" title="个人主页实时预览" src="editable-site-preview.html"></iframe>
       </div>
     </section>
 
-    <section class="feature-band" id="features">
-      <div class="section-inner">
-        <div class="section-heading"><p class="eyebrow">WHAT YOU CAN DO</p><h2>内容、布局和发布，都在一处完成</h2></div>
-        <div class="feature-grid">
-          <article><span>01</span><h3>直接编辑</h3><p>上传头像和图片，编辑经历、产品、摄影、笔记与链接。</p></article>
-          <article><span>02</span><h3>自由组合</h3><p>复制、隐藏、删除和排序模块，按自己的内容组织页面。</p></article>
-          <article><span>03</span><h3>保留版本</h3><p>草稿自动保存在本机，也可以手动创建历史版本并随时恢复。</p></article>
-          <article><span>04</span><h3>导出发布</h3><p>导出完整网页，再部署到 GitHub Pages，获得可分享的公开链接。</p></article>
+    <aside class="editor-pane" aria-label="编辑区">
+      <div class="editor-mode-switch" role="tablist" aria-label="编辑内容">
+        <button class="is-active" type="button" data-editor-mode="home" role="tab">个人主页</button>
+        <button type="button" data-editor-mode="notes" role="tab">笔记中心</button>
+      </div>
+      <div class="panel-scroll">
+        <div id="homeEditorPanels">
+          <section class="panel-section">
+            <div class="panel-heading theme-heading"><div><span class="eyebrow">THEME</span><h1>主题色</h1></div><div id="themeEditor"></div></div>
+          </section>
+
+          <section class="panel-section">
+            <div class="panel-heading"><div><span class="eyebrow">PROFILE</span><h1>头像与介绍</h1></div></div>
+            <div id="profileEditor"></div>
+          </section>
+
+          <section class="panel-section" id="contentSection">
+            <div class="panel-heading"><div><span class="eyebrow">CONTENT</span><h2 id="contentHeading">模块内容</h2></div></div>
+            <div id="moduleEditor"></div>
+          </section>
+
+          <section class="panel-section">
+            <div class="panel-heading"><div><span class="eyebrow">FOOTER</span><h2>页脚链接</h2></div></div>
+            <div id="footerEditor"></div>
+          </section>
+
+          <section class="panel-section">
+            <div class="panel-heading"><div><span class="eyebrow">BUTTON</span><h2>底部按钮</h2></div></div>
+            <div id="ctaEditor"></div>
+          </section>
+        </div>
+
+        <div id="notesEditorPanels" hidden>
+          <section class="panel-section notes-library-section">
+            <div class="panel-heading"><div><span class="eyebrow">NOTES</span><h1>笔记中心</h1></div><button class="button ghost" type="button" data-action="preview-note-center">预览笔记页</button></div>
+            <div id="notesLibraryEditor"></div>
+          </section>
         </div>
       </div>
-    </section>
-
-    <section class="workflow-band">
-      <div class="section-inner workflow">
-        <div class="section-heading"><p class="eyebrow">WORKFLOW</p><h2>三步拥有自己的主页</h2></div>
-        <ol><li><b>编辑内容</b><span>从模板开始，换成自己的文字和照片。</span></li><li><b>实时预览</b><span>同时检查电脑和手机上的展示效果。</span></li><li><b>下载发布</b><span>下载网页并上传到 GitHub Pages。</span></li></ol>
-      </div>
-    </section>
-
-    <section class="download-band" id="install">
-      <div class="section-inner download-content">
-        <div><p class="eyebrow">START NOW</p><h2>快速体验，或安装后长期使用</h2><p>快速开始不会保留历史；安装应用后，草稿和历史版本会保存在当前设备中。</p></div>
-        <div class="download-actions"><a class="button primary quick-start" href="editor.html?mode=quick" data-tip="不保留历史">快速开始</a><button class="button secondary install-button" data-install-app type="button">安装应用</button></div>
-      </div>
-    </section>
+      <dialog class="module-picker" id="modulePicker">
+        <div class="module-picker-head"><strong>添加模块</strong><button class="icon-button" type="button" data-action="close-module-picker" aria-label="关闭">×</button></div>
+        <div class="module-template-list">
+          <button type="button" data-action="add-module-template" data-type="experience"><span>我的经历</span><small>经历卡片与轮播</small></button>
+          <button type="button" data-action="add-module-template" data-type="products"><span>我的产品</span><small>产品图标、介绍与链接</small></button>
+          <button type="button" data-action="add-module-template" data-type="xhs"><span>我的小红书</span><small>图片卡片与横向轮播</small></button>
+          <button type="button" data-action="add-module-template" data-type="album"><span>我的摄影</span><small>翻页相册与页面模板</small></button>
+          <button type="button" data-action="add-module-template" data-type="notes"><span>我的笔记</span><small>从笔记中心选择主页展示内容</small></button>
+        </div>
+      </dialog>
+    </aside>
   </main>
 
-  <footer><span>I'm 个人主页编辑器</span><a href="https://github.com/1607254697lyx/im-page" target="_blank" rel="noopener">GitHub</a></footer>
-  <div class="install-notice" id="installNotice" role="status" hidden></div>
-  <script src="product.js"></script>
+  <dialog class="module-picker history-dialog" id="historyDialog">
+    <div class="module-picker-head"><strong>历史记录</strong><button class="icon-button" id="closeHistoryButton" type="button" aria-label="关闭">×</button></div>
+    <div class="history-dialog-body">
+      <div class="history-toolbar"><p>版本保存在当前设备，不会上传到网络。</p><button class="button primary" id="saveVersionButton" type="button">保存当前版本</button></div>
+      <div class="history-list" id="historyList"></div>
+    </div>
+  </dialog>
+
+  <dialog class="module-picker publish-dialog" id="publishDialog">
+    <div class="module-picker-head"><strong>发布网站</strong><button class="icon-button" id="closePublishButton" type="button" aria-label="关闭">×</button></div>
+    <div class="publish-dialog-body">
+      <p id="publishMessage">正在保存 index.html…</p>
+      <div class="publish-result" id="publishResult" hidden>
+        <div class="publish-link-row">
+          <input id="publishFilePath" type="text" value="~/Downloads/index.html" readonly aria-label="index.html 文件地址">
+          <button class="button ghost" id="copyPublishPathButton" type="button">复制地址</button>
+        </div>
+      </div>
+      <div class="publish-dialog-actions">
+        <a class="button primary" href="https://github.com/new" target="_blank" rel="noopener">前往 GitHub</a>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="icon-crop-dialog" id="iconCropDialog">
+    <div class="module-picker-head"><strong id="iconCropTitle">裁剪图片</strong><button class="icon-button" id="closeIconCropButton" type="button" aria-label="关闭">×</button></div>
+    <div class="icon-crop-body">
+      <div class="icon-crop-stage" id="iconCropStage"><img id="iconCropImage" alt="待裁剪图片"><div class="icon-crop-box" id="iconCropBox"><span class="icon-crop-handle" aria-hidden="true"></span></div></div>
+      <canvas id="iconCropCanvas" width="720" height="720" hidden></canvas>
+      <p class="icon-crop-hint" id="iconCropHint">拖动方框选择区域，拖动右下角调整大小</p>
+      <div class="icon-crop-actions"><button class="button ghost" id="cancelIconCropButton" type="button">取消</button><button class="button primary" id="confirmIconCropButton" type="button">使用此裁剪</button></div>
+    </div>
+  </dialog>
+
+  <input id="configImport" type="file" accept="application/json" hidden>
+  <script src="personal-site-editor.js"></script>
+  <script>if('serviceWorker' in navigator&&location.protocol.indexOf('http')===0){navigator.serviceWorker.register('service-worker.js');}</script>
 </body>
 </html>

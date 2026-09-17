@@ -2,7 +2,7 @@
   "name": "I'm 个人主页编辑器",
   "short_name": "I'm 编辑器",
   "description": "上传内容、调整布局，轻松做出属于自己的个人主页。",
-  "start_url": "./editor.html",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#ffffff",
