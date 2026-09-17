@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>yaxin 的自留地</title>
 <meta name="description" content="yaxin，一个正在快速成长的 AI 产品练习生的自留地">
 <style>
@@ -160,12 +160,14 @@ body{
   transition:border-color .2s,box-shadow .2s,transform .2s;
 }
 .works-row:hover{border-color:var(--accent-soft);box-shadow:0 6px 16px rgba(140,130,110,.10);transform:translateY(-2px);}
+.works-row + .works-row{margin-top:12px;}
 .works-row:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px;}
 .works-icon{
   flex:none;width:52px;height:52px;
   display:flex;align-items:center;justify-content:center;
+  border-radius:12px;overflow:hidden;
 }
-.works-icon img{width:100%;height:100%;object-fit:contain;}
+.works-icon img{width:100%;height:100%;object-fit:cover;border-radius:inherit;}
 .works-mid{flex:1;min-width:0;}
 .works-title{font-size:16px;font-weight:400;display:block;}
 .works-desc{font-size:13px;color:var(--ink-2);margin-top:3px;display:block;}

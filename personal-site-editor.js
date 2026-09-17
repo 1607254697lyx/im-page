@@ -56,6 +56,15 @@
   var footerEditor=document.getElementById('footerEditor');
   var ctaEditor=document.getElementById('ctaEditor');
   var statusNode=document.getElementById('saveStatus');
+  var iconCropDialog=document.getElementById('iconCropDialog');
+  var iconCropStage=document.getElementById('iconCropStage');
+  var iconCropImage=document.getElementById('iconCropImage');
+  var iconCropBox=document.getElementById('iconCropBox');
+  var iconCropCanvas=document.getElementById('iconCropCanvas');
+  var iconCropContext=iconCropCanvas.getContext('2d');
+  var iconCropTitle=document.getElementById('iconCropTitle');
+  var iconCropHint=document.getElementById('iconCropHint');
+  var iconCropState=null;
 
   function esc(value){return String(value==null?'':value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
   function clone(value){return JSON.parse(JSON.stringify(value));}
@@ -86,7 +95,7 @@
   function textarea(label,value,attributes){return '<label class="field"><span>'+label+'</span><textarea '+attributes+'>'+esc(value)+'</textarea></label>';}
 
   function renderProfile(){
-    profileEditor.innerHTML='<div class="field"><span>头像</span>'+imageField(config.profile.avatar,'data-image="profile" data-field="avatar"')+'</div>'+field('名字',config.profile.name,'data-action="profile-field" data-field="name"')+field('名字链接',config.profile.nameLink,'data-action="profile-field" data-field="nameLink"','url')+textarea('简短介绍',config.profile.intro,'data-action="profile-field" data-field="intro"');
+    profileEditor.innerHTML='<div class="field profile-avatar-field"><span>头像</span>'+imageField(config.profile.avatar,'data-image="profile" data-field="avatar"')+'</div>'+field('名字',config.profile.name,'data-action="profile-field" data-field="name"')+field('名字链接',config.profile.nameLink,'data-action="profile-field" data-field="nameLink"','url')+textarea('简短介绍',config.profile.intro,'data-action="profile-field" data-field="intro"');
   }
 
   function itemHeader(label,module,index){
@@ -159,8 +168,27 @@
   }
 
   function readImage(file){return new Promise(function(resolve,reject){var reader=new FileReader();reader.onload=function(){resolve(reader.result);};reader.onerror=reject;reader.readAsDataURL(file);});}
+  function drawIconCrop(){
+    if(!iconCropState)return;
+    var rect=iconCropState.imageRect,crop=iconCropState.crop;
+    iconCropImage.style.left=rect.x+'px';iconCropImage.style.top=rect.y+'px';iconCropImage.style.width=rect.width+'px';iconCropImage.style.height=rect.height+'px';
+    iconCropBox.style.left=crop.x+'px';iconCropBox.style.top=crop.y+'px';iconCropBox.style.width=crop.size+'px';iconCropBox.style.height=crop.size+'px';iconCropBox.style.setProperty('--crop-size',crop.size+'px');
+  }
+  async function openIconCrop(file,input){
+    var data=await readImage(file),image=new Image();
+    image.onload=function(){
+      var isAvatar=input.dataset.image==='profile';
+      iconCropDialog.classList.toggle('is-avatar',isAvatar);
+      iconCropTitle.textContent=isAvatar?'裁剪头像':'裁剪产品图标';
+      iconCropHint.textContent=isAvatar?'拖动圆形区域选择头像，拖动右下角调整大小':'拖动方框选择区域，拖动右下角调整大小';
+      iconCropDialog.showModal();
+      requestAnimationFrame(function(){var stageWidth=iconCropStage.clientWidth,stageHeight=iconCropStage.clientHeight,scale=Math.min(stageWidth/image.naturalWidth,stageHeight/image.naturalHeight),width=image.naturalWidth*scale,height=image.naturalHeight*scale,x=(stageWidth-width)/2,y=(stageHeight-height)/2,size=Math.min(width,height)*.72;iconCropImage.src=data;iconCropState={image:image,input:input,kind:isAvatar?'avatar':'product',moduleId:input.dataset.id,index:Number(input.dataset.index),field:input.dataset.field,imageRect:{x:x,y:y,width:width,height:height},crop:{x:x+(width-size)/2,y:y+(height-size)/2,size:size},dragging:false};drawIconCrop();});
+    };
+    image.src=data;
+  }
   async function handleImage(input){
     if(!input.files||!input.files[0])return;
+    if(input.dataset.image==='profile'||(input.dataset.image==='item'&&getModule(input.dataset.id).type==='products')){openIconCrop(input.files[0],input);return;}
     var data=await readImage(input.files[0]);
     if(input.dataset.image==='profile') config.profile[input.dataset.field]=data;
     if(input.dataset.image==='album-cover') getModule(input.dataset.id).cover=data;
@@ -192,6 +220,16 @@
     if(target.type==='file'){handleImage(target);return;}
     if(target.dataset.action==='album-layout'){var page=getModule(target.dataset.id).pages[Number(target.dataset.index)];page.layout=target.value;if(target.value==='pair'&&!page.images[1])page.images[1]='';changed(true);}
   });
+  iconCropBox.addEventListener('pointerdown',function(event){if(!iconCropState)return;iconCropState.dragging=true;iconCropState.mode=event.target.classList.contains('icon-crop-handle')?'resize':'move';iconCropState.pointerId=event.pointerId;iconCropState.startX=event.clientX;iconCropState.startY=event.clientY;iconCropState.startCrop={x:iconCropState.crop.x,y:iconCropState.crop.y,size:iconCropState.crop.size};iconCropBox.setPointerCapture(event.pointerId);event.preventDefault();});
+  iconCropBox.addEventListener('pointermove',function(event){if(!iconCropState||!iconCropState.dragging||iconCropState.pointerId!==event.pointerId)return;var dx=event.clientX-iconCropState.startX,dy=event.clientY-iconCropState.startY,rect=iconCropState.imageRect,start=iconCropState.startCrop;if(iconCropState.mode==='resize'){var maxSize=Math.min(rect.x+rect.width-start.x,rect.y+rect.height-start.y);iconCropState.crop.size=Math.max(60,Math.min(maxSize,start.size+Math.max(dx,dy)));}else{iconCropState.crop.x=Math.max(rect.x,Math.min(rect.x+rect.width-start.size,start.x+dx));iconCropState.crop.y=Math.max(rect.y,Math.min(rect.y+rect.height-start.size,start.y+dy));}drawIconCrop();});
+  function stopIconCropDrag(event){if(iconCropState&&iconCropState.pointerId===event.pointerId)iconCropState.dragging=false;}
+  iconCropBox.addEventListener('pointerup',stopIconCropDrag);
+  iconCropBox.addEventListener('pointercancel',stopIconCropDrag);
+  function closeIconCrop(){if(iconCropState&&iconCropState.input)iconCropState.input.value='';iconCropState=null;iconCropDialog.close();}
+  document.getElementById('closeIconCropButton').addEventListener('click',closeIconCrop);
+  document.getElementById('cancelIconCropButton').addEventListener('click',closeIconCrop);
+  iconCropDialog.addEventListener('cancel',function(event){event.preventDefault();closeIconCrop();});
+  document.getElementById('confirmIconCropButton').addEventListener('click',function(){if(!iconCropState)return;var state=iconCropState,rect=state.imageRect,crop=state.crop,sx=(crop.x-rect.x)/rect.width*state.image.naturalWidth,sy=(crop.y-rect.y)/rect.height*state.image.naturalHeight,sourceSize=crop.size/rect.width*state.image.naturalWidth;iconCropContext.clearRect(0,0,iconCropCanvas.width,iconCropCanvas.height);iconCropContext.save();if(state.kind==='avatar'){iconCropContext.beginPath();iconCropContext.arc(iconCropCanvas.width/2,iconCropCanvas.height/2,iconCropCanvas.width/2,0,Math.PI*2);iconCropContext.clip();}iconCropContext.drawImage(state.image,sx,sy,sourceSize,sourceSize,0,0,iconCropCanvas.width,iconCropCanvas.height);iconCropContext.restore();var result=iconCropCanvas.toDataURL('image/png');if(state.kind==='avatar')config.profile[state.field]=result;else{var module=getModule(state.moduleId);if(module&&module.items[state.index])module.items[state.index][state.field]=result;}iconCropState=null;iconCropDialog.close();changed(true);});
   document.querySelector('.editor-pane').addEventListener('click',async function(event){
     var button=event.target.closest('button[data-action]');if(!button)return;
     var action=button.dataset.action,id=button.dataset.id,module=getModule(id),index=Number(button.dataset.index);

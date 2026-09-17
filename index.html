@@ -2,13 +2,14 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>个人网页生成器</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>个人主页编辑器</title>
+  <meta name="description" content="上传内容、调整布局，轻松做出属于自己的个人主页。">
   <link rel="stylesheet" href="personal-site-editor.css">
 </head>
 <body>
   <header class="topbar">
-    <div class="brand"><span class="brand-mark">I‘m</span><span>个人网页生成器</span></div>
+    <div class="brand"><span class="brand-mark" aria-label="I'm">I’m</span><span>个人主页编辑器</span></div>
     <div class="top-actions">
       <span class="save-status" id="saveStatus">准备就绪</span>
       <button class="button ghost" id="resetButton" type="button">恢复初始</button>
@@ -84,6 +85,16 @@
       <div class="publish-dialog-actions">
         <a class="button primary" href="https://github.com/new" target="_blank" rel="noopener">前往 GitHub</a>
       </div>
+    </div>
+  </dialog>
+
+  <dialog class="icon-crop-dialog" id="iconCropDialog">
+    <div class="module-picker-head"><strong id="iconCropTitle">裁剪图片</strong><button class="icon-button" id="closeIconCropButton" type="button" aria-label="关闭">×</button></div>
+    <div class="icon-crop-body">
+      <div class="icon-crop-stage" id="iconCropStage"><img id="iconCropImage" alt="待裁剪图片"><div class="icon-crop-box" id="iconCropBox"><span class="icon-crop-handle" aria-hidden="true"></span></div></div>
+      <canvas id="iconCropCanvas" width="720" height="720" hidden></canvas>
+      <p class="icon-crop-hint" id="iconCropHint">拖动方框选择区域，拖动右下角调整大小</p>
+      <div class="icon-crop-actions"><button class="button ghost" id="cancelIconCropButton" type="button">取消</button><button class="button primary" id="confirmIconCropButton" type="button">使用此裁剪</button></div>
     </div>
   </dialog>
 
