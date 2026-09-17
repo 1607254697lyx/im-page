@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>个人主页编辑器</title>
+  <meta name="description" content="上传内容、调整布局，轻松做出属于自己的个人主页。">
+  <meta name="theme-color" content="#8478D2">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="personal-site-editor.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark" aria-label="I'm">I’m</span><span>个人主页编辑器</span></div>
+    <div class="top-actions">
+      <span class="save-status" id="saveStatus">准备就绪</span>
+      <button class="button ghost history-button" id="historyButton" type="button">历史记录</button>
+      <button class="button ghost" id="resetButton" type="button">恢复初始</button>
+      <button class="button ghost" id="exportConfigButton" type="button">导出配置</button>
+      <button class="button ghost" id="exportHtmlButton" type="button">下载网页</button>
+      <button class="button primary" id="publishButton" type="button">发布</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="preview-pane" aria-label="网页预览">
+      <div class="preview-toolbar">
+        <span>实时预览</span>
+        <div class="view-switch" role="group" aria-label="预览尺寸">
+          <button type="button" class="is-active" data-view="desktop" title="桌面预览">桌面</button>
+          <button type="button" data-view="mobile" title="手机预览">手机</button>
+        </div>
+      </div>
+      <div class="preview-stage" id="previewStage">
+        <iframe id="sitePreview" title="个人主页实时预览" src="editable-site-preview.html"></iframe>
+      </div>
+    </section>
+
+    <aside class="editor-pane" aria-label="编辑区">
+      <div class="editor-mode-switch" role="tablist" aria-label="编辑内容">
+        <button class="is-active" type="button" data-editor-mode="home" role="tab">个人主页</button>
+        <button type="button" data-editor-mode="notes" role="tab">笔记中心</button>
+      </div>
+      <div class="panel-scroll">
+        <div id="homeEditorPanels">
+          <section class="panel-section">
+            <div class="panel-heading theme-heading"><div><span class="eyebrow">THEME</span><h1>主题色</h1></div><div id="themeEditor"></div></div>
+          </section>
+
+          <section class="panel-section">
+            <div class="panel-heading"><div><span class="eyebrow">PROFILE</span><h1>头像与介绍</h1></div></div>
+            <div id="profileEditor"></div>
+          </section>
+
+          <section class="panel-section" id="contentSection">
+            <div class="panel-heading"><div><span class="eyebrow">CONTENT</span><h2 id="contentHeading">模块内容</h2></div></div>
+            <div id="moduleEditor"></div>
+          </section>
+
+          <section class="panel-section">
+            <div class="panel-heading"><div><span class="eyebrow">FOOTER</span><h2>页脚链接</h2></div></div>
+            <div id="footerEditor"></div>
+          </section>
+
+          <section class="panel-section">
+            <div class="panel-heading"><div><span class="eyebrow">BUTTON</span><h2>底部按钮</h2></div></div>
+            <div id="ctaEditor"></div>
+          </section>
+        </div>
+
+        <div id="notesEditorPanels" hidden>
+          <section class="panel-section notes-library-section">
+            <div class="panel-heading"><div><span class="eyebrow">NOTES</span><h1>笔记中心</h1></div><button class="button ghost" type="button" data-action="preview-note-center">预览笔记页</button></div>
+            <div id="notesLibraryEditor"></div>
+          </section>
+        </div>
+      </div>
+      <dialog class="module-picker" id="modulePicker">
+        <div class="module-picker-head"><strong>添加模块</strong><button class="icon-button" type="button" data-action="close-module-picker" aria-label="关闭">×</button></div>
+        <div class="module-template-list">
+          <button type="button" data-action="add-module-template" data-type="experience"><span>我的经历</span><small>经历卡片与轮播</small></button>
+          <button type="button" data-action="add-module-template" data-type="products"><span>我的产品</span><small>产品图标、介绍与链接</small></button>
+          <button type="button" data-action="add-module-template" data-type="xhs"><span>我的小红书</span><small>图片卡片与横向轮播</small></button>
+          <button type="button" data-action="add-module-template" data-type="album"><span>我的摄影</span><small>翻页相册与页面模板</small></button>
+          <button type="button" data-action="add-module-template" data-type="notes"><span>我的笔记</span><small>从笔记中心选择主页展示内容</small></button>
+        </div>
+      </dialog>
+    </aside>
+  </main>
+
+  <dialog class="module-picker history-dialog" id="historyDialog">
+    <div class="module-picker-head"><strong>历史记录</strong><button class="icon-button" id="closeHistoryButton" type="button" aria-label="关闭">×</button></div>
+    <div class="history-dialog-body">
+      <div class="history-toolbar"><p>版本保存在当前设备，不会上传到网络。</p><button class="button primary" id="saveVersionButton" type="button">保存当前版本</button></div>
+      <div class="history-list" id="historyList"></div>
+    </div>
+  </dialog>
+
+  <dialog class="module-picker publish-dialog" id="publishDialog">
+    <div class="module-picker-head"><strong>发布网站</strong><button class="icon-button" id="closePublishButton" type="button" aria-label="关闭">×</button></div>
+    <div class="publish-dialog-body">
+      <p id="publishMessage">正在保存 index.html…</p>
+      <div class="publish-result" id="publishResult" hidden>
+        <div class="publish-link-row">
+          <input id="publishFilePath" type="text" value="~/Downloads/index.html" readonly aria-label="index.html 文件地址">
+          <button class="button ghost" id="copyPublishPathButton" type="button">复制地址</button>
+        </div>
+      </div>
+      <div class="publish-dialog-actions">
+        <a class="button primary" href="https://github.com/new" target="_blank" rel="noopener">前往 GitHub</a>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="icon-crop-dialog" id="iconCropDialog">
+    <div class="module-picker-head"><strong id="iconCropTitle">裁剪图片</strong><button class="icon-button" id="closeIconCropButton" type="button" aria-label="关闭">×</button></div>
+    <div class="icon-crop-body">
+      <div class="icon-crop-stage" id="iconCropStage"><img id="iconCropImage" alt="待裁剪图片"><div class="icon-crop-box" id="iconCropBox"><span class="icon-crop-handle" aria-hidden="true"></span></div></div>
+      <canvas id="iconCropCanvas" width="720" height="720" hidden></canvas>
+      <p class="icon-crop-hint" id="iconCropHint">拖动方框选择区域，拖动右下角调整大小</p>
+      <div class="icon-crop-actions"><button class="button ghost" id="cancelIconCropButton" type="button">取消</button><button class="button primary" id="confirmIconCropButton" type="button">使用此裁剪</button></div>
+    </div>
+  </dialog>
+
+  <input id="configImport" type="file" accept="application/json" hidden>
+  <script src="personal-site-editor.js"></script>
+  <script>if('serviceWorker' in navigator&&location.protocol.indexOf('http')===0){navigator.serviceWorker.register('service-worker.js');}</script>
+</body>
+</html>
