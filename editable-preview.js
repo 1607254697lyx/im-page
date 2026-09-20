@@ -266,19 +266,58 @@
     });
   }
 
+  var defaultImageDataPromise=null;
+  function loadDefaultImageData(){
+    if(window.__DEFAULT_IMAGE_DATA__)return Promise.resolve(window.__DEFAULT_IMAGE_DATA__);
+    if(defaultImageDataPromise)return defaultImageDataPromise;
+    defaultImageDataPromise=new Promise(function(resolve){
+      var script=document.createElement('script');
+      script.src='default-assets.js';
+      script.onload=function(){resolve(window.__DEFAULT_IMAGE_DATA__||{});};
+      script.onerror=function(){resolve({});};
+      document.head.appendChild(script);
+    });
+    return defaultImageDataPromise;
+  }
+
+  function blobToDataUrl(blob){
+    return new Promise(function(resolve){
+      var reader=new FileReader();
+      reader.onload=function(){resolve(reader.result);};
+      reader.onerror=function(){resolve(null);};
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  async function imageToDataUrl(img){
+    var source=img.getAttribute('src')||'';
+    if(/^data:image\//i.test(source))return source;
+    if(location.protocol!=='file:'){
+      try{
+        var response=await fetch(img.currentSrc||img.src,{cache:'force-cache'});
+        if(response.ok)return await blobToDataUrl(await response.blob());
+      }catch(error){}
+    }
+    var defaults=await loadDefaultImageData();
+    if(defaults[source])return defaults[source];
+    if(!img.complete||!img.naturalWidth)return null;
+    try{
+      var canvas=document.createElement('canvas');
+      canvas.width=img.naturalWidth;canvas.height=img.naturalHeight;
+      canvas.getContext('2d').drawImage(img,0,0);
+      var png=/\.png(?:$|\?)/i.test(source);
+      return canvas.toDataURL(png?'image/png':'image/jpeg',.9);
+    }catch(error){return null;}
+  }
+
   async function exportStandalone(){
     if(document.body.classList.contains('notes-center-mode')&&currentConfig)render(currentConfig);
     var sourceImages=Array.prototype.slice.call(document.images);
+    var conversions={};
     var imageData=await Promise.all(sourceImages.map(function(img){
-      if(!img.complete||!img.naturalWidth)return Promise.resolve(null);
-      if(/^data:image\//i.test(img.src))return Promise.resolve(img.src);
-      try{
-        var canvas=document.createElement('canvas');
-        canvas.width=img.naturalWidth;canvas.height=img.naturalHeight;
-        canvas.getContext('2d').drawImage(img,0,0);
-        var png=/\.png(?:$|\?)/i.test(img.src);
-        return Promise.resolve(canvas.toDataURL(png?'image/png':'image/jpeg',.9));
-      }catch(error){return Promise.resolve(null);}
+      var key=img.getAttribute('src')||img.src;
+      if(!conversions[key])conversions[key]=imageToDataUrl(img);
+      return conversions[key];
     }));
     var clone=document.documentElement.cloneNode(true);
     var viewport=clone.querySelector('meta[name="viewport"]');
