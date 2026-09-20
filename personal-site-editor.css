@@ -76,6 +76,10 @@ button{letter-spacing:0}
 .featured-note-row strong{display:block;font-size:13px;font-weight:500;overflow-wrap:anywhere}
 .featured-note-row small{display:block;margin-top:3px;color:var(--muted);font-size:10px}
 .featured-note-row .icon-button:disabled,.note-category-card .icon-button:disabled{opacity:.22;cursor:default}
+.featured-note-summary{display:flex;align-items:center;gap:11px;padding:13px;border:1px solid var(--line);background:#faf9f6}
+.featured-note-summary .featured-heart{color:var(--accent);font-size:18px;line-height:1}
+.featured-note-summary strong{display:block;font-size:13px;font-weight:500}
+.featured-note-summary small{display:block;margin-top:3px;color:var(--muted);font-size:11px}
 .featured-empty,.featured-all-added{padding:18px 10px;border:1px dashed var(--line);color:var(--muted);font-size:12px;text-align:center}
 .featured-all-added{margin-top:10px;padding:10px;border-style:solid;background:#faf9f6}
 .featured-add{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;margin-top:10px}
@@ -87,6 +91,11 @@ button{letter-spacing:0}
 .note-category-head>input:focus{color:var(--accent)}
 .library-note-card{padding:13px;margin-bottom:9px;border:1px solid var(--line);background:#faf9f6}
 .library-note-card .item-head{margin-bottom:10px}
+.note-heart{position:relative;width:24px;height:22px;padding:0;border:0;background:transparent;color:#aaa59c;cursor:pointer;font-size:15px;line-height:22px}
+.note-heart:hover,.note-heart.is-active{color:var(--accent)}
+.note-heart.is-active{background:var(--accent-soft)}
+.note-heart[data-tip]::after{content:attr(data-tip);position:absolute;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);padding:3px 6px;background:#34322e;color:#fff;font-size:10px;line-height:1.2;white-space:nowrap;opacity:0;pointer-events:none;z-index:20}
+.note-heart[data-tip]:hover::after{opacity:1}
 .note-file-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:2px}
 .note-file-row>div{min-width:0}
 .note-file-row span{display:block;color:var(--muted);font-size:11px}

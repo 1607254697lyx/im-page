@@ -43,10 +43,12 @@ body.editor-preview-mode{width:100%;max-width:100%;min-height:100vh;overflow-x:h
 .editor-preview-mode .xhs-cards{grid-template-columns:repeat(3,minmax(0,1fr));}
 .editor-preview-mode .story-arrow,.xhs-arrow{width:34px;height:34px;padding:0;border:1px solid #D9D4CB;border-radius:50%;background:#fff;color:var(--ink-2);font-size:18px;line-height:1;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:none;}
 .editor-preview-mode .story-arrow:hover:not(:disabled),.xhs-arrow:hover{background:var(--card-warm);color:var(--accent);border-color:#D9D4CB;}
-.xhs-carousel{display:grid;grid-template-columns:34px minmax(0,1fr) 34px;align-items:center;gap:10px;}
-.xhs-window{overflow:hidden;}
+.xhs-carousel{position:relative;display:block;width:100%;}
+.xhs-window{width:100%;overflow:hidden;padding:4px 0 12px;margin:-4px 0 -12px;}
 .xhs-track{display:grid;grid-auto-flow:column;grid-auto-columns:calc((100% - 24px)/3);column-gap:12px;transition:transform .38s cubic-bezier(.25,.8,.3,1);}
-.xhs-arrow{position:static;transform:none;}
+.xhs-arrow{position:absolute;z-index:3;top:50%;transform:translateY(-50%);}
+.xhs-prev{left:-46px;}
+.xhs-next{right:-46px;}
 .xhs-arrow[hidden]{display:inline-flex!important;visibility:hidden;pointer-events:none;}
 .editor-preview-mode .footer{padding-top:8px;}
 .editor-preview-mode .note-row{align-items:center;padding:17px 4px;text-decoration:none;}
@@ -93,9 +95,11 @@ body.editor-preview-mode{width:100%;max-width:100%;min-height:100vh;overflow-x:h
   .site-module.story{margin-top:54px;}
   .editor-preview-mode .xhs-cards{grid-template-columns:repeat(2,minmax(0,1fr));}
   .xhs-track{max-width:100%;grid-auto-columns:calc((100% - 8px)/2);column-gap:8px;}
-  .xhs-carousel{width:100%;max-width:100%;min-width:0;grid-template-columns:30px minmax(0,1fr) 30px;gap:6px;}
+  .xhs-carousel{width:100%;max-width:100%;min-width:0;}
   .xhs-window{min-width:0;max-width:100%;}
   .xhs-arrow{width:30px;height:30px;}
+  .xhs-prev{left:-16px;}
+  .xhs-next{right:-16px;}
   .editor-preview-mode .ab-cover-photo{width:40%;}
   .editor-preview-mode .story-card,.editor-preview-mode .story-card.portrait,.editor-preview-mode .story-card.portrait.reverse{display:flex;min-height:350px;padding:64px 18px 24px;gap:18px;}
   .editor-preview-mode .story-line{top:0;height:58px;}

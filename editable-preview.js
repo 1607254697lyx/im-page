@@ -114,7 +114,7 @@
     var library=[];(currentConfig.notesLibrary&&currentConfig.notesLibrary.categories||[]).forEach(function(category){(category.notes||[]).forEach(function(note){library.push({id:note.id,title:note.title,date:note.date,content:note.content,category:category.name});});});
     if(!library.length)library=(module.items||[]).map(function(note){return {id:note.id,title:note.title,date:note.date,content:note.content,category:note.category||'未分类'};});
     var featuredIds=Array.isArray(module.featuredNoteIds)?module.featuredNoteIds:library.map(function(note){return note.id;});
-    var items=featuredIds.map(function(id){return library.find(function(note){return note.id===id;});}).filter(Boolean);
+    var items=library.filter(function(note){return featuredIds.indexOf(note.id)!==-1;});
     return '<section class="site-module works photo-book-wrap" data-module-id="'+esc(module.id)+'" data-module-type="notes"><p class="works-group-title">'+esc(module.title)+'</p><div class="notes-list">'+
       (items.length ? items.map(function(item){
         var meta=[item.category,item.date].filter(Boolean).map(esc).join(' · ');
@@ -280,20 +280,11 @@
         return Promise.resolve(canvas.toDataURL(png?'image/png':'image/jpeg',.9));
       }catch(error){return Promise.resolve(null);}
     }));
-    var linkedCss='';
-    try{
-      var previewSheet=Array.prototype.slice.call(document.styleSheets).find(function(sheet){return sheet.href&&/editable-preview\.css(?:$|\?)/.test(sheet.href);});
-      if(previewSheet)linkedCss=Array.prototype.slice.call(previewSheet.cssRules).map(function(rule){return rule.cssText;}).join('\n');
-    }catch(error){}
     var clone=document.documentElement.cloneNode(true);
     var viewport=clone.querySelector('meta[name="viewport"]');
     if(viewport) viewport.setAttribute('content','width=device-width, initial-scale=1.0, viewport-fit=cover');
     Array.prototype.slice.call(clone.querySelectorAll('img')).forEach(function(img,index){if(imageData[index])img.setAttribute('src',imageData[index]);});
     Array.prototype.slice.call(clone.querySelectorAll('script')).forEach(function(node){node.remove();});
-    var linked=clone.querySelector('link[href="editable-preview.css"]');if(linked)linked.remove();
-    var extra=clone.ownerDocument.createElement('style');
-    extra.textContent=linkedCss;
-    clone.querySelector('head').appendChild(extra);
     var runtime=clone.ownerDocument.createElement('script');
     runtime.textContent='('+initInteractions.toString()+')();';
     clone.querySelector('body').appendChild(runtime);
